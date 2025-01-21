@@ -15,3 +15,13 @@ git clone https://github.com/stavsap/comfyui-kokoro.git
 ```
 
 The model and speakers meta datat will be automatically downloads on the first run.
+
+## Nodes
+
+Currently, there are 3 nodes that can be combined for TTS workflow.
+
+### Kokoro Speaker
+
+### Kokoro Speaker Combiner
+
+### Kokoro Generate
