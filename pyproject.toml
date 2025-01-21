@@ -3,7 +3,7 @@ name = "comfyui-kokoro"
 description = "Custom ComfyUI Nodes for TTS with Kokoro, genenrate and merge speakers for new style generations."
 version = "1.0.1"
 license = { file = "LICENSE" }
-dependencies = ["ollama"]
+dependencies = ["kokoro-onnx", "onnxruntime", "numpy", "requests", "tqdm"]
 
 [project.urls]
 Repository = "https://github.com/stavsap/comfyui-kokoro"
