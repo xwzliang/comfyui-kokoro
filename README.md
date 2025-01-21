@@ -46,3 +46,31 @@ Example:
 - **speaker**: input a speaker
 - **speed**: set the speach speed.
 - **lang**: set the language, what ever is supported by kokoro.
+
+
+## Available Voices
+
+The following voices are available:
+- **af** (African Female)
+- **af_sarah** (African Female Sarah)
+- **af_bella** (African Female Bella)
+- **af_nicole** (African Female Nicole)
+- **af_sky** (African Female Sky)
+- **am_adam** (African Male Adam)
+- **am_michael** (African Male Michael)
+- **bf_emma** (British Female Emma)
+- **bf_isabella** (British Female Isabella)
+- **bm_george** (British Male George)
+- **bm_lewis** (British Male Lewis)
+
+## License
+
+kokoro-onnx: MIT
+kokoro model: Apache 2.0
+
+## Credits
+
+- Kokoro TTS Engine: [Include credits for the original Kokoro TTS project]
+- ComfyUI: https://github.com/comfyanonymous/ComfyUI
+- [ComfyUI-BS_Kokoro-onnx](https://github.com/Burgstall-labs/ComfyUI-BS_Kokoro-onnx)
+- [ComfyUI-KokoroTTS](https://github.com/benjiyaya/ComfyUI-KokoroTTS)
