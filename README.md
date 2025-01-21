@@ -63,6 +63,14 @@ The following voices are available:
 - **bm_george** (British Male George)
 - **bm_lewis** (British Male Lewis)
 
+## Use Cases:
+
+1. TTS: Text To Speach, generate voice from test.
+
+2. Lip Sync: sync lips of videos
+
+![lipsync.png](.meta/lipsync.png)
+
 ## License
 
 - [This repo](LICENSE)
