@@ -75,8 +75,48 @@ class KokoroSpeaker:
         return ({"speaker": speaker},)
 
     @classmethod
-    def IS_CHANGED(cls, text, speaker):
-        return hash((text, speaker))
+    def IS_CHANGED(cls, speaker_name):
+        return hash(speaker_name)
+
+class KokoroSpeakerCombiner:
+    @classmethod
+    def INPUT_TYPES(s):
+        return {
+            "required": {
+                "speaker_a": ("KOKORO_SPEAKER", ),
+                "speaker_b": ("KOKORO_SPEAKER", ),
+                "weight": ("FLOAT", {"default": 0.5, "min": 0, "max": 1, "step": 0.05}),
+            },
+        }
+
+    RETURN_TYPES = ("KOKORO_SPEAKER",)
+    RETURN_NAMES = ("speaker",)
+
+    FUNCTION = "combine"
+
+    CATEGORY = "kokoro"
+
+    def __init__(self):
+        self.kokoro = None
+        self.node_dir = os.path.dirname(os.path.abspath(__file__))
+        self.voices_path = os.path.join(self.node_dir, VOICES_FILENAME)
+        self.model_path = os.path.join(self.node_dir, MODEL_FILENAME)
+
+    def combine(self, speaker_a, speaker_b, weight):
+
+        if not os.path.exists(self.voices_path):
+            download_file(VOICES_URL, VOICES_FILENAME, self.node_dir+"/")
+            download_file(MODEL_URL, MODEL_FILENAME, self.node_dir+"/")
+        weight = weight * 100.0
+        weight_a = weight
+        weight_b = 100.0 - weight
+        speaker = np.add(speaker_a["speaker"] * (weight_a / 100.0), speaker_b["speaker"] * (weight_b / 100.0))
+
+        return ({"speaker": speaker},)
+
+    @classmethod
+    def IS_CHANGED(cls, speaker_a, speaker_b, weight):
+        return hash((speaker_a, speaker_b, weight))
 
 class KokoroGenerator:
     @classmethod
@@ -85,6 +125,12 @@ class KokoroGenerator:
             "required": {
                 "text": ("STRING", {"multiline": True, "default": "I am a synthesized robot"}),
                 "speaker": ("KOKORO_SPEAKER", ),
+                "speed": ("FLOAT", {"default": 1, "min": 0.1, "max": 4, "step": 0.05}),
+                "lang": ("STRING", {
+                    "multiline": False,
+                    "default": "en-us"
+                }),
+
             },
         }
 
@@ -101,7 +147,7 @@ class KokoroGenerator:
         self.model_path = os.path.join(self.node_dir, MODEL_FILENAME)
         self.voices_path = os.path.join(self.node_dir, VOICES_FILENAME)
 
-    def generate(self, text, speaker):
+    def generate(self, text, speaker, speed, lang):
 
         if not os.path.exists(self.model_path) or not os.path.exists(self.voices_path):
             download_file(VOICES_URL, VOICES_FILENAME, self.node_dir+"/")
@@ -114,33 +160,33 @@ class KokoroGenerator:
              return (None,)
 
         try:
-            audio, sample_rate = kokoro.create(text, voice=speaker["speaker"], speed=1.0, lang="en-us")
+            audio, sample_rate = kokoro.create(text, voice=speaker["speaker"], speed=speed, lang=lang)
         except Exception as e:
-            logger.error(f"ERROR: could not generate speech using kokoro.create. Error: {e}")
+            logger.error(f"{e}")
             return (None,)
 
         if audio is None:
-             logger.error("ERROR: the text-to-speech generation did not return audio. Make sure you have a valid text string.")
+             logger.error("no audio is generated")
              return (None,)
 
-        # Convert the numpy array to the format expected by comfy audio output
         audio_tensor = torch.from_numpy(audio).unsqueeze(0).unsqueeze(0).float()  # Add a batch dimension AND a channel dimension
 
-        logger.info(f"Successfuly generated audio. Audio shape: {audio_tensor.shape}. Audio length: {len(audio)}")
         return ({"waveform": audio_tensor, "sample_rate": sample_rate},) #return as tuple
 
     @classmethod
-    def IS_CHANGED(cls, text, speaker):
-        return hash((text, speaker))
+    def IS_CHANGED(cls, text, speaker, speed, lang):
+        return hash((text, speaker, speed, lang))
 
 
 
 NODE_CLASS_MAPPINGS = {
     "KokoroGenerator": KokoroGenerator,
     "KokoroSpeaker": KokoroSpeaker,
+    "KokoroSpeakerCombiner": KokoroSpeakerCombiner,
 }
 
 NODE_DISPLAY_NAME_MAPPINGS = {
     "KokoroGenerator": "Kokoro Generator",
     "KokoroSpeaker": "Kokoro Speaker",
+    "KokoroSpeakerCombiner": "Kokoro Speaker Combiner",
 }
