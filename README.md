@@ -65,8 +65,8 @@ The following voices are available:
 
 ## License
 
-kokoro-onnx: MIT
-kokoro model: Apache 2.0
+- kokoro-onnx: MIT
+- kokoro model: Apache 2.0
 
 ## Credits
 
