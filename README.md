@@ -14,7 +14,7 @@ Clone the repo into `custom_nodes` folder, and reboot Comfy.
 git clone https://github.com/stavsap/comfyui-kokoro.git
 ```
 
-The model and speakers meta datat will be automatically downloads on the first run.
+The model and speakers meta-data will be automatically downloaded on the first run.
 
 ## Nodes
 
