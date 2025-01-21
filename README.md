@@ -65,6 +65,7 @@ The following voices are available:
 
 ## License
 
+- [This repo](LICENSE)
 - kokoro-onnx: MIT
 - kokoro model: Apache 2.0
 
