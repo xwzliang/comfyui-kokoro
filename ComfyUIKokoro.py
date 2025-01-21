@@ -11,6 +11,9 @@ logger = logging.getLogger(__name__)
 MODEL_URL = "https://github.com/thewh1teagle/kokoro-onnx/releases/download/model-files/kokoro-v0_19.onnx"
 VOICES_URL = "https://github.com/thewh1teagle/kokoro-onnx/releases/download/model-files/voices.json"
 
+MODEL_FILENAME = "voices.json"
+VOICES_FILENAME = "kokoro-v0_19.onnx"
+
 def download_file(url, file_name, path):
     if not os.path.exists(path):
         os.makedirs(path)
@@ -61,13 +64,13 @@ class KokoroSpeaker:
         self.kokoro = None
         logger.info("Initializing Kokoro Speaker class.")
         self.node_dir = os.path.dirname(os.path.abspath(__file__))
-        self.voices_path = os.path.join(self.node_dir, "voices.json")
-        self.model_path = os.path.join(self.node_dir, "kokoro-v0_19.onnx")
+        self.voices_path = os.path.join(self.node_dir, VOICES_FILENAME)
+        self.model_path = os.path.join(self.node_dir, MODEL_FILENAME)
 
     def select(self, speaker_name):
         if not os.path.exists(self.voices_path):
-            download_file(VOICES_URL, "voices.json", self.node_dir)
-            download_file(MODEL_URL, "kokoro-v0_19.onnx", self.node_dir)
+            download_file(VOICES_URL, VOICES_FILENAME, self.node_dir+"/")
+            download_file(MODEL_URL, MODEL_FILENAME, self.node_dir+"/")
         kokoro = Kokoro(self.model_path, self.voices_path)
         speaker: np.ndarray = kokoro.get_voice_style(speaker_name)
         return ({"speaker": speaker},)
@@ -82,6 +85,7 @@ class KokoroGenerator:
         return {
             "required": {
                 "text": ("STRING", {"multiline": True, "default": "I am a synthesized robot"}),
+                "speaker_v": ("KOKORO_SPEAKER", ),
                 "speaker": (
                     [
                         "af",
@@ -111,16 +115,16 @@ class KokoroGenerator:
     def __init__(self):
         self.kokoro = None
         logger.info("Initializing KokoroTTS class.")
-        node_dir = os.path.dirname(os.path.abspath(__file__))
-        self.model_path = os.path.join(node_dir, "kokoro-v0_19.onnx")
-        self.voices_path = os.path.join(node_dir, "voices.json")
+        self.node_dir = os.path.dirname(os.path.abspath(__file__))
+        self.model_path = os.path.join(self.node_dir, MODEL_FILENAME)
+        self.voices_path = os.path.join(self.node_dir, VOICES_FILENAME)
 
 
-    def generate(self, text, speaker):
+    def generate(self, text, speaker, speaker_v):
 
         if not os.path.exists(self.model_path) or not os.path.exists(self.voices_path):
-            download_file(VOICES_URL, "voices.json", self.node_dir)
-            download_file(MODEL_URL, "kokoro-v0_19.onnx", self.node_dir)
+            download_file(VOICES_URL, VOICES_FILENAME, self.node_dir+"/")
+            download_file(MODEL_URL, MODEL_FILENAME, self.node_dir+"/")
 
         try:
             kokoro = Kokoro(model_path=self.model_path, voices_path=self.voices_path)
@@ -152,8 +156,10 @@ class KokoroGenerator:
 
 NODE_CLASS_MAPPINGS = {
     "KokoroGenerator": KokoroGenerator,
+    "KokoroSpeaker": KokoroSpeaker,
 }
 
 NODE_DISPLAY_NAME_MAPPINGS = {
     "KokoroGenerator": "Kokoro Generator",
+    "KokoroSpeaker": "Kokoro Speaker",
 }
