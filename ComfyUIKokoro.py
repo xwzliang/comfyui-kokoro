@@ -11,8 +11,8 @@ logger = logging.getLogger(__name__)
 MODEL_URL = "https://github.com/thewh1teagle/kokoro-onnx/releases/download/model-files/kokoro-v0_19.onnx"
 VOICES_URL = "https://github.com/thewh1teagle/kokoro-onnx/releases/download/model-files/voices.json"
 
-MODEL_FILENAME = "voices.json"
-VOICES_FILENAME = "kokoro-v0_19.onnx"
+MODEL_FILENAME = "kokoro-v0_19.onnx"
+VOICES_FILENAME = "voices.json"
 
 def download_file(url, file_name, path):
     if not os.path.exists(path):
@@ -62,7 +62,6 @@ class KokoroSpeaker:
 
     def __init__(self):
         self.kokoro = None
-        logger.info("Initializing Kokoro Speaker class.")
         self.node_dir = os.path.dirname(os.path.abspath(__file__))
         self.voices_path = os.path.join(self.node_dir, VOICES_FILENAME)
         self.model_path = os.path.join(self.node_dir, MODEL_FILENAME)
@@ -85,23 +84,7 @@ class KokoroGenerator:
         return {
             "required": {
                 "text": ("STRING", {"multiline": True, "default": "I am a synthesized robot"}),
-                "speaker_v": ("KOKORO_SPEAKER", ),
-                "speaker": (
-                    [
-                        "af",
-                        "af_sarah",
-                        "af_bella",
-                        "af_nicole",
-                        "af_sky",
-                        "am_adam",
-                        "am_michael",
-                        "bf_emma",
-                        "bf_isabella",
-                        "bm_george",
-                        "bm_lewis",
-                    ],
-                    {"default": "af_sarah"},
-                ),
+                "speaker": ("KOKORO_SPEAKER", ),
             },
         }
 
@@ -114,13 +97,11 @@ class KokoroGenerator:
 
     def __init__(self):
         self.kokoro = None
-        logger.info("Initializing KokoroTTS class.")
         self.node_dir = os.path.dirname(os.path.abspath(__file__))
         self.model_path = os.path.join(self.node_dir, MODEL_FILENAME)
         self.voices_path = os.path.join(self.node_dir, VOICES_FILENAME)
 
-
-    def generate(self, text, speaker, speaker_v):
+    def generate(self, text, speaker):
 
         if not os.path.exists(self.model_path) or not os.path.exists(self.voices_path):
             download_file(VOICES_URL, VOICES_FILENAME, self.node_dir+"/")
@@ -133,7 +114,7 @@ class KokoroGenerator:
              return (None,)
 
         try:
-            audio, sample_rate = kokoro.create(text, voice=speaker, speed=1.0, lang="en-us")
+            audio, sample_rate = kokoro.create(text, voice=speaker["speaker"], speed=1.0, lang="en-us")
         except Exception as e:
             logger.error(f"ERROR: could not generate speech using kokoro.create. Error: {e}")
             return (None,)
