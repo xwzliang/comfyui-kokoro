@@ -153,22 +153,29 @@ class KokoroGenerator:
             download_file(VOICES_URL, VOICES_FILENAME, self.node_dir+"/")
             download_file(MODEL_URL, MODEL_FILENAME, self.node_dir+"/")
 
+        np_load_old = np.load
+        np.load = lambda *a, **k: np_load_old(*a, allow_pickle=True, **k)
+
         try:
             kokoro = Kokoro(model_path=self.model_path, voices_path=self.voices_path)
         except Exception as e:
              logger.error(f"ERROR: could not load kokoro-onnx in generate: {e}")
+             np.load = np_load_old
              return (None,)
 
         try:
             audio, sample_rate = kokoro.create(text, voice=speaker["speaker"], speed=speed, lang=lang)
         except Exception as e:
             logger.error(f"{e}")
+            np.load = np_load_old
             return (None,)
 
         if audio is None:
              logger.error("no audio is generated")
+             np.load = np_load_old
              return (None,)
 
+        np.load = np_load_old
         audio_tensor = torch.from_numpy(audio).unsqueeze(0).unsqueeze(0).float()  # Add a batch dimension AND a channel dimension
 
         return ({"waveform": audio_tensor, "sample_rate": sample_rate},) #return as tuple
