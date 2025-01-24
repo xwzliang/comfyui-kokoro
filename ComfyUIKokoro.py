@@ -5,14 +5,13 @@ import logging
 import os
 import requests
 from tqdm import tqdm
+import io
 
 logger = logging.getLogger(__name__)
 
-MODEL_URL = "https://github.com/thewh1teagle/kokoro-onnx/releases/download/model-files/kokoro-v0_19.onnx"
-VOICES_URL = "https://github.com/thewh1teagle/kokoro-onnx/releases/download/model-files/voices.json"
-
+MODEL_URL = "https://huggingface.co/hexgrad/Kokoro-82M/resolve/main/kokoro-v0_19.onnx?download=true"
 MODEL_FILENAME = "kokoro-v0_19.onnx"
-VOICES_FILENAME = "voices.json"
+VOICES_FILENAME = "voices.bin"
 
 def download_file(url, file_name, path):
     if not os.path.exists(path):
@@ -21,13 +20,53 @@ def download_file(url, file_name, path):
         total_size = int(response.headers.get('content-length', 0))
         block_size = 4096  # 4KB blocks
         progress_bar = tqdm(total=total_size, unit='B', unit_scale=True, desc=file_name)
-        with open(path+file_name, 'wb') as file:
+        with open(os.path.join(path, file_name), 'wb') as file:
             for data in response.iter_content(block_size):
                 progress_bar.update(len(data))
                 file.write(data)
 
         progress_bar.close()
 
+def download_voices(path):
+    file_path = os.path.join(path, VOICES_FILENAME)
+
+    if os.path.exists(file_path):
+        return
+
+    names = [
+        "af",
+        "af_bella",
+        "af_nicole",
+        "af_sarah",
+        "af_sky",
+        "am_adam",
+        "am_michael",
+        "bf_emma",
+        "bf_isabella",
+        "bm_george",
+        "bm_lewis",
+    ]
+
+    pattern = "https://huggingface.co/hexgrad/Kokoro-82M/resolve/main/voices/{name}.pt"
+    voices = {}
+
+    for name in names:
+        url = pattern.format(name=name)
+        print(f"Downloading {url}")
+        r = requests.get(url)
+        r.raise_for_status()  # Ensure the request was successful
+        content = io.BytesIO(r.content)
+        data: np.ndarray = torch.load(content, weights_only=True).numpy()
+        voices[name] = data
+
+    with open(file_path, "wb") as f:
+        np.savez(f, **voices)
+    print(f"Created {file_path}")
+
+def download_model(path):
+    if os.path.exists(os.path.join(path, MODEL_FILENAME)):
+        return
+    download_file(MODEL_URL, MODEL_FILENAME, path)
 
 class KokoroSpeaker:
     @classmethod
@@ -67,9 +106,8 @@ class KokoroSpeaker:
         self.model_path = os.path.join(self.node_dir, MODEL_FILENAME)
 
     def select(self, speaker_name):
-        if not os.path.exists(self.voices_path):
-            download_file(VOICES_URL, VOICES_FILENAME, self.node_dir+"/")
-            download_file(MODEL_URL, MODEL_FILENAME, self.node_dir+"/")
+        download_model(self.node_dir)
+        download_voices(self.node_dir)
         kokoro = Kokoro(self.model_path, self.voices_path)
         speaker: np.ndarray = kokoro.get_voice_style(speaker_name)
         return ({"speaker": speaker},)
@@ -103,10 +141,8 @@ class KokoroSpeakerCombiner:
         self.model_path = os.path.join(self.node_dir, MODEL_FILENAME)
 
     def combine(self, speaker_a, speaker_b, weight):
-
-        if not os.path.exists(self.voices_path):
-            download_file(VOICES_URL, VOICES_FILENAME, self.node_dir+"/")
-            download_file(MODEL_URL, MODEL_FILENAME, self.node_dir+"/")
+        download_model(self.node_dir)
+        download_voices(self.node_dir)
         weight = weight * 100.0
         weight_a = weight
         weight_b = 100.0 - weight
@@ -148,10 +184,8 @@ class KokoroGenerator:
         self.voices_path = os.path.join(self.node_dir, VOICES_FILENAME)
 
     def generate(self, text, speaker, speed, lang):
-
-        if not os.path.exists(self.model_path) or not os.path.exists(self.voices_path):
-            download_file(VOICES_URL, VOICES_FILENAME, self.node_dir+"/")
-            download_file(MODEL_URL, MODEL_FILENAME, self.node_dir+"/")
+        download_model(self.node_dir)
+        download_voices(self.node_dir)
 
         np_load_old = np.load
         np.load = lambda *a, **k: np_load_old(*a, allow_pickle=True, **k)
