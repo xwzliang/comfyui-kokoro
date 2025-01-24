@@ -14,7 +14,6 @@ MODEL_FILENAME = "kokoro-v0_19.onnx"
 VOICES_FILENAME = "voices.bin"
 
 def download_file(url, file_name, path):
-    np.load("")
     if not os.path.exists(path):
         os.makedirs(path)
     with requests.get(url, stream=True, allow_redirects=True) as response:
