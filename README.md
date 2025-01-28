@@ -4,7 +4,7 @@ Kokoro TTS nodes, based on this [kokoro repo](https://github.com/thewh1teagle/ko
 
 ![workflow.png](.meta/workflow.png)
 
-note: this picture is also workflow, just drop it into comfy.
+**note**: This picture is also a workflow, just download and drop it into comfy.
 
 ## Install
 
