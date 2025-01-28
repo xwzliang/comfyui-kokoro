@@ -9,7 +9,7 @@ import io
 
 logger = logging.getLogger(__name__)
 
-MODEL_URL = "https://huggingface.co/hexgrad/Kokoro-82M/resolve/main/kokoro-v0_19.onnx?download=true"
+MODEL_URL = "https://huggingface.co/hexgrad/kLegacy/resolve/main/v0.19/kokoro-v0_19.onnx?download=true"
 MODEL_FILENAME = "kokoro-v0_19.onnx"
 VOICES_FILENAME = "voices.bin"
 
@@ -47,7 +47,7 @@ def download_voices(path):
         "bm_lewis",
     ]
 
-    pattern = "https://huggingface.co/hexgrad/Kokoro-82M/resolve/main/voices/{name}.pt"
+    pattern = "https://huggingface.co/hexgrad/kLegacy/resolve/main/v0.19/voices/{name}.pt"
     voices = {}
 
     for name in names:
