@@ -1,5 +1,9 @@
 # Comfy UI Kokoro
 
+<a href="https://www.buymeacoffee.com/stavsapq" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/default-orange.png" alt="Buy Me A Coffee" height="40" width="174"></a>
+
+<img src="https://img.shields.io/badge/v0.19-green.svg?style=for-the-badge&labelColor=gray&label=Kokoro&color=blue" alt=""/>
+
 Kokoro TTS nodes, based on this [kokoro repo](https://github.com/thewh1teagle/kokoro-onnx)
 
 ![workflow.png](.meta/workflow.png)
@@ -79,7 +83,7 @@ The following voices are available:
 
 ## Credits
 
-- Kokoro TTS Engine: [Include credits for the original Kokoro TTS project]
-- ComfyUI: https://github.com/comfyanonymous/ComfyUI
+- [Kokoro TTS Engine](https://huggingface.co/hexgrad/Kokoro-82M)
+- [ComfyUI](https://github.com/comfyanonymous/ComfyUI)
 - [ComfyUI-BS_Kokoro-onnx](https://github.com/Burgstall-labs/ComfyUI-BS_Kokoro-onnx)
 - [ComfyUI-KokoroTTS](https://github.com/benjiyaya/ComfyUI-KokoroTTS)
