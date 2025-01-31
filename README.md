@@ -22,7 +22,7 @@ Clone the repo into `custom_nodes` folder, and reboot Comfy.
 git clone https://github.com/stavsap/comfyui-kokoro.git
 ```
 
-Then cd into `comfyui-kokoro` install requirements.
+Then cd into `comfyui-kokoro`, and install requirements.
 
 ```shell
 pip install -r requirements.txt 
