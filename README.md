@@ -12,11 +12,22 @@ Kokoro TTS nodes, based on this [kokoro repo](https://github.com/thewh1teagle/ko
 
 ## Install
 
+Install Via ComfyUI Manager
+
+Or
+
 Clone the repo into `custom_nodes` folder, and reboot Comfy.
 
 ```shell
 git clone https://github.com/stavsap/comfyui-kokoro.git
 ```
+
+Then cd into `comfyui-kokoro` install requirements.
+
+```shell
+pip install -r requirements.txt 
+```
+
 
 The model and speakers meta-data will be automatically downloaded on the first run.
 
