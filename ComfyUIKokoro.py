@@ -9,9 +9,73 @@ import io
 
 logger = logging.getLogger(__name__)
 
-MODEL_URL = "https://huggingface.co/hexgrad/kLegacy/resolve/main/v0.19/kokoro-v0_19.onnx?download=true"
-MODEL_FILENAME = "kokoro-v0_19.onnx"
-VOICES_FILENAME = "voices.bin"
+MODEL_URL = "https://github.com/taylorchu/kokoro-onnx/releases/download/v0.2.0/kokoro.onnx"
+MODEL_FILENAME = "kokoro_v1.onnx"
+VOICES_FILENAME = "voices_v1.bin"
+
+supported_voices =[
+    # American Female
+    "af_heart",
+    "af_alloy",
+    "af_aoede",
+    "af_bella",
+    "af_jessica",
+    "af_kore",
+    "af_nicole",
+    "af_nova",
+    "af_river",
+    "af_sarah",
+    "af_sky",
+    #American Male
+    "am_adam",
+    "am_echo",
+    "am_eric",
+    "am_fenrir",
+    "am_liam",
+    "am_michael",
+    "am_onyx",
+    "am_puck",
+    "am_santa",
+    # British Female
+    "bf_alice",
+    "bf_emma",
+    "bf_isabella",
+    "bf_lily",
+    # British Male
+    "bm_daniel",
+    "bm_fable",
+    "bm_george",
+    "bm_lewis",
+    # Japanese Female
+    "jf_alpha",
+    "jf_gongitsune",
+    "jf_nezumi",
+    "jf_tebukuro",
+    # Japanese Male
+    "jm_kumo",
+
+    "zf_xiaobei",
+    "zf_xiaoni",
+    "zf_xiaoxiao",
+    "zf_xiaoyi",
+    "zm_yunjian",
+    "zm_yunxi",
+    "zm_yunxia",
+    "zm_yunyang",
+    "ef_dora",
+    "em_alex",
+    "em_santa",
+    "ff_siwis",
+    "hf_alpha",
+    "hf_beta",
+    "hm_omega",
+    "hm_psi",
+    "if_sara",
+    "im_nicola",
+    "pf_dora",
+    "pm_alex",
+    "pm_santa",
+]
 
 def download_file(url, file_name, path):
     if not os.path.exists(path):
@@ -33,21 +97,9 @@ def download_voices(path):
     if os.path.exists(file_path):
         return
 
-    names = [
-        "af",
-        "af_bella",
-        "af_nicole",
-        "af_sarah",
-        "af_sky",
-        "am_adam",
-        "am_michael",
-        "bf_emma",
-        "bf_isabella",
-        "bm_george",
-        "bm_lewis",
-    ]
+    names = supported_voices
 
-    pattern = "https://huggingface.co/hexgrad/kLegacy/resolve/main/v0.19/voices/{name}.pt"
+    pattern = "https://huggingface.co/hexgrad/Kokoro-82M/resolve/main/voices/{name}.pt"
     voices = {}
 
     for name in names:
@@ -74,19 +126,7 @@ class KokoroSpeaker:
         return {
             "required": {
                 "speaker_name": (
-                    [
-                        "af",
-                        "af_sarah",
-                        "af_bella",
-                        "af_nicole",
-                        "af_sky",
-                        "am_adam",
-                        "am_michael",
-                        "bf_emma",
-                        "bf_isabella",
-                        "bm_george",
-                        "bm_lewis",
-                    ],
+                    supported_voices,
                     {"default": "af_sarah"},
                 ),
             },
