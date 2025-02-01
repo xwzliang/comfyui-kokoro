@@ -65,18 +65,7 @@ Example:
 
 ## Available Voices
 
-The following voices are available:
-- **af** (African Female)
-- **af_sarah** (African Female Sarah)
-- **af_bella** (African Female Bella)
-- **af_nicole** (African Female Nicole)
-- **af_sky** (African Female Sky)
-- **am_adam** (African Male Adam)
-- **am_michael** (African Male Michael)
-- **bf_emma** (British Female Emma)
-- **bf_isabella** (British Female Isabella)
-- **bm_george** (British Male George)
-- **bm_lewis** (British Male Lewis)
+All supported voices can be found [here](https://huggingface.co/hexgrad/Kokoro-82M/blob/main/VOICES.md).
 
 ## Use Cases:
 
