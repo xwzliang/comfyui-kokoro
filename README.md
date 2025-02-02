@@ -3,6 +3,7 @@
 <a href="https://www.buymeacoffee.com/stavsapq" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/default-orange.png" alt="Buy Me A Coffee" height="40" width="174"></a>
 
 <img src="https://img.shields.io/badge/v1.0-green.svg?style=for-the-badge&labelColor=gray&label=Kokoro&color=blue" alt=""/>
+<img src="https://img.shields.io/badge/0.3.7-green.svg?style=for-the-badge&labelColor=gray&label=Kokoro-onnx&color=blue" alt=""/>
 
 Kokoro TTS nodes, based on this [kokoro repo](https://github.com/thewh1teagle/kokoro-onnx)
 

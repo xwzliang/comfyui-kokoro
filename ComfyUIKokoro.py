@@ -13,6 +13,17 @@ MODEL_URL = "https://github.com/taylorchu/kokoro-onnx/releases/download/v0.2.0/k
 MODEL_FILENAME = "kokoro_v1.onnx"
 VOICES_FILENAME = "voices_v1.bin"
 
+supported_languages_display = ["English", "English (British)","French", "Japanese", "Korean", "Mandarin Chinese"]
+
+supported_languages = {
+    supported_languages_display[0]: "en-us",
+    supported_languages_display[1]: "en-gb",
+    supported_languages_display[2]: "fr-fr",
+    supported_languages_display[3]: "ja",
+    supported_languages_display[4]: "ko",
+    supported_languages_display[5]: "cmn",
+}
+
 supported_voices =[
     # American Female
     "af_heart",
@@ -202,9 +213,9 @@ class KokoroGenerator:
                 "text": ("STRING", {"multiline": True, "default": "I am a synthesized robot"}),
                 "speaker": ("KOKORO_SPEAKER", ),
                 "speed": ("FLOAT", {"default": 1, "min": 0.1, "max": 4, "step": 0.05}),
-                "lang": ("STRING", {
-                    "multiline": False,
-                    "default": "en-us"
+                "lang": (
+                    supported_languages_display,
+                    {"default": "English"
                 }),
 
             },
@@ -227,29 +238,34 @@ class KokoroGenerator:
         download_model(self.node_dir)
         download_voices(self.node_dir)
 
-        np_load_old = np.load
-        np.load = lambda *a, **k: np_load_old(*a, allow_pickle=True, **k)
+        # np_load_old = np.load
+        # np.load = lambda *a, **k: np_load_old(*a, allow_pickle=True, **k)
+
+        lang = supported_languages[lang]
+
+        if lang is None:
+            lang = "en-us"
 
         try:
             kokoro = Kokoro(model_path=self.model_path, voices_path=self.voices_path)
         except Exception as e:
              logger.error(f"ERROR: could not load kokoro-onnx in generate: {e}")
-             np.load = np_load_old
+             # np.load = np_load_old
              return (None,)
 
         try:
             audio, sample_rate = kokoro.create(text, voice=speaker["speaker"], speed=speed, lang=lang)
         except Exception as e:
             logger.error(f"{e}")
-            np.load = np_load_old
+            # np.load = np_load_old
             return (None,)
 
         if audio is None:
              logger.error("no audio is generated")
-             np.load = np_load_old
+             # np.load = np_load_old
              return (None,)
 
-        np.load = np_load_old
+        # np.load = np_load_old
         audio_tensor = torch.from_numpy(audio).unsqueeze(0).unsqueeze(0).float()  # Add a batch dimension AND a channel dimension
 
         return ({"waveform": audio_tensor, "sample_rate": sample_rate},) #return as tuple

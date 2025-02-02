@@ -1,3 +1,7 @@
+02-02-2025
+
+Add supported languages as drop down menu (**might be breaking change**, default will be `English`)
+
 01-02-2025
 
 Support kokoro V1.0
