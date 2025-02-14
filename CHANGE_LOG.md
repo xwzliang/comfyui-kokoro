@@ -1,3 +1,7 @@
+15-02-2025
+
+Add missing languages selectors.
+
 13-02-2025
 
 Add missing Spanish language selector.

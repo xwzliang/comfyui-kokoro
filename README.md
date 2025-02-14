@@ -5,7 +5,7 @@
 <img src="https://img.shields.io/badge/v1.0-green.svg?style=for-the-badge&labelColor=gray&label=Kokoro&color=blue" alt=""/>
 <img src="https://img.shields.io/badge/0.4.2-green.svg?style=for-the-badge&labelColor=gray&label=Kokoro-onnx&color=blue" alt=""/>
 
-Kokoro TTS nodes, based on this [kokoro repo](https://github.com/thewh1teagle/kokoro-onnx)
+Kokoro TTS nodes, wrapping this [kokoro onnx](https://github.com/thewh1teagle/kokoro-onnx) that is based on [hexgrad/Kokoro-82M](https://huggingface.co/hexgrad/Kokoro-82M).
 
 ![workflow.png](.meta/workflow.png)
 
@@ -13,11 +13,13 @@ Kokoro TTS nodes, based on this [kokoro repo](https://github.com/thewh1teagle/ko
 
 ## Install
 
-Install Via ComfyUI Manager
+Install Via ComfyUI Manager, by `stavsap`.
+
+![img.png](.meta/img.png)
 
 Or
 
-Clone the repo into `custom_nodes` folder, and reboot Comfy.
+Clone the repo into `custom_nodes` folder
 
 ```shell
 git clone https://github.com/stavsap/comfyui-kokoro.git
@@ -28,9 +30,9 @@ Then cd into `comfyui-kokoro`, and install requirements.
 ```shell
 pip install -r requirements.txt 
 ```
+And finally reboot Comfy.
 
-
-The model and speakers meta-data will be automatically downloaded on the first run.
+The onnx model and speakers meta-data will be automatically downloaded on the first run.
 
 ## Nodes
 

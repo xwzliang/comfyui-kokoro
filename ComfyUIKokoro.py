@@ -13,16 +13,18 @@ MODEL_URL = "https://github.com/taylorchu/kokoro-onnx/releases/download/v0.2.0/k
 MODEL_FILENAME = "kokoro_v1.onnx"
 VOICES_FILENAME = "voices_v1.bin"
 
-supported_languages_display = ["English", "English (British)","French", "Japanese", "Korean", "Mandarin Chinese", "Spanish"]
+supported_languages_display = ["English", "English (British)","French", "Japanese", "Hindi", "Mandarin Chinese", "Spanish", "Brazilian Portuguese", "Italian"]
 
 supported_languages = {
     supported_languages_display[0]: "en-us",
     supported_languages_display[1]: "en-gb",
     supported_languages_display[2]: "fr-fr",
     supported_languages_display[3]: "ja",
-    supported_languages_display[4]: "ko",
+    supported_languages_display[4]: "hi",
     supported_languages_display[5]: "cmn",
     supported_languages_display[6]: "es",
+    supported_languages_display[7]: "pt-br",
+    supported_languages_display[8]: "it",
 }
 
 supported_voices =[
