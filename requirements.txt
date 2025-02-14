@@ -3,3 +3,7 @@ onnxruntime
 numpy
 requests
 tqdm
+misaki
+ordered_set
+num2words
+spacy
