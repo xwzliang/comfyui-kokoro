@@ -7,3 +7,5 @@ misaki
 ordered_set
 num2words
 spacy
+kokoro>=0.7.11
+soundfile
