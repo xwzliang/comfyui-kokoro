@@ -8,6 +8,7 @@ from tqdm import tqdm
 import io
 from misaki import en, espeak
 from misaki.zh import ZHG2P
+from kokoro import KPipeline
 
 logger = logging.getLogger(__name__)
 
@@ -264,10 +265,22 @@ class KokoroGenerator:
 
         try:
             if lang == "cmn":
-                g2p = ZHG2P()
-                phonemes = g2p(text)
-                print(phonemes)
-                audio, sample_rate = kokoro.create(phonemes, voice=speaker["speaker"], speed=speed, lang=lang, is_phonemes=True, trim=False)
+                # g2p = ZHG2P()
+                # phonemes = g2p(text)
+                # print(phonemes)
+                # audio, sample_rate = kokoro.create(phonemes, voice=speaker["speaker"], speed=speed, lang=lang, is_phonemes=True, trim=False)
+                pipeline = KPipeline(lang_code='z')
+                generator = pipeline(
+                    text, voice=speaker["speaker"], # <= change voice here
+                    speed=speed, split_pattern=r'\n+'
+                )
+                for i, (gs, ps, audio_seg) in enumerate(generator):
+                    print(i)  # i => index
+                    print(gs) # gs => graphemes/text
+                    print(ps) # ps => phonemes
+                    # display(Audio(data=audio_seg, rate=24000, autoplay=i==0))
+                    # sf.write(f'{i}.wav', audio_seg, 24000) # save each audio file
+                    audio, sample_rate = audio_seg, 24000
             else:
                 # Misaki G2P with espeak-ng fallback
                 fallback = espeak.EspeakFallback(british=False)
