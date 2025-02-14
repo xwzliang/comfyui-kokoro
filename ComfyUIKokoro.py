@@ -6,25 +6,29 @@ import os
 import requests
 from tqdm import tqdm
 import io
+from misaki import en, espeak
+from misaki.zh import ZHG2P
 
 logger = logging.getLogger(__name__)
 
-MODEL_URL = "https://github.com/taylorchu/kokoro-onnx/releases/download/v0.2.0/kokoro.onnx"
-MODEL_FILENAME = "kokoro_v1.onnx"
-VOICES_FILENAME = "voices_v1.bin"
+# MODEL_URL = "https://github.com/taylorchu/kokoro-onnx/releases/download/v0.2.0/kokoro.onnx"
+MODEL_URL = "https://github.com/thewh1teagle/kokoro-onnx/releases/download/model-files-v1.0/kokoro-v1.0.onnx"
+VOICE_URL = "https://github.com/thewh1teagle/kokoro-onnx/releases/download/model-files-v1.0/voices-v1.0.bin"
+# MODEL_FILENAME = "kokoro_v1.onnx"
+# VOICES_FILENAME = "voices_v1.bin"
+MODEL_FILENAME = "kokoro-v1.0.onnx"
+VOICES_FILENAME = "voices-v1.0.bin"
 
-supported_languages_display = ["English", "English (British)","French", "Japanese", "Hindi", "Mandarin Chinese", "Spanish", "Brazilian Portuguese", "Italian"]
+supported_languages_display = ["English", "English (British)","French", "Japanese", "Korean", "Mandarin Chinese", "Spanish"]
 
 supported_languages = {
     supported_languages_display[0]: "en-us",
     supported_languages_display[1]: "en-gb",
     supported_languages_display[2]: "fr-fr",
     supported_languages_display[3]: "ja",
-    supported_languages_display[4]: "hi",
+    supported_languages_display[4]: "ko",
     supported_languages_display[5]: "cmn",
     supported_languages_display[6]: "es",
-    supported_languages_display[7]: "pt-br",
-    supported_languages_display[8]: "it",
 }
 
 supported_voices =[
@@ -110,24 +114,26 @@ def download_voices(path):
 
     if os.path.exists(file_path):
         return
+    
+    download_file(VOICE_URL, VOICES_FILENAME, path)
 
-    names = supported_voices
+    # names = supported_voices
 
-    pattern = "https://huggingface.co/hexgrad/Kokoro-82M/resolve/main/voices/{name}.pt"
-    voices = {}
+    # pattern = "https://huggingface.co/hexgrad/Kokoro-82M/resolve/main/voices/{name}.pt"
+    # voices = {}
 
-    for name in names:
-        url = pattern.format(name=name)
-        print(f"Downloading {url}")
-        r = requests.get(url)
-        r.raise_for_status()  # Ensure the request was successful
-        content = io.BytesIO(r.content)
-        data: np.ndarray = torch.load(content, weights_only=True).numpy()
-        voices[name] = data
+    # for name in names:
+    #     url = pattern.format(name=name)
+    #     print(f"Downloading {url}")
+    #     r = requests.get(url)
+    #     r.raise_for_status()  # Ensure the request was successful
+    #     content = io.BytesIO(r.content)
+    #     data: np.ndarray = torch.load(content, weights_only=True).numpy()
+    #     voices[name] = data
 
-    with open(file_path, "wb") as f:
-        np.savez(f, **voices)
-    print(f"Created {file_path}")
+    # with open(file_path, "wb") as f:
+    #     np.savez(f, **voices)
+    # print(f"Created {file_path}")
 
 def download_model(path):
     if os.path.exists(os.path.join(path, MODEL_FILENAME)):
@@ -257,7 +263,17 @@ class KokoroGenerator:
              return (None,)
 
         try:
-            audio, sample_rate = kokoro.create(text, voice=speaker["speaker"], speed=speed, lang=lang)
+            if lang == "cmn":
+                g2p = ZHG2P()
+                phonemes = g2p(text)
+                print(phonemes)
+                audio, sample_rate = kokoro.create(phonemes, voice=speaker["speaker"], speed=speed, lang=lang, is_phonemes=True, trim=False)
+            else:
+                # Misaki G2P with espeak-ng fallback
+                fallback = espeak.EspeakFallback(british=False)
+                g2p = en.G2P(trf=False, british=False, fallback=fallback)
+                phonemes, _ = g2p(text)
+                audio, sample_rate = kokoro.create(phonemes, voice=speaker["speaker"], speed=speed, lang=lang, is_phonemes=True)
         except Exception as e:
             logger.error(f"{e}")
             # np.load = np_load_old
