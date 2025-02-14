@@ -34,6 +34,10 @@ And finally reboot Comfy.
 
 The onnx model and speakers meta-data will be automatically downloaded on the first run.
 
+If using windows portable version and experience issues with dependencies, check the following:
+
+<iframe width="560" height="315" src="https://www.youtube.com/embed/4dZ2L7VY94A?si=fye4zKts_tH8Ryrk" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+
 ## Nodes
 
 Currently, there are 3 nodes that can be combined for TTS workflow.
