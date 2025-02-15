@@ -1,11 +1,5 @@
-kokoro-onnx==0.4.2
-onnxruntime
-numpy
-requests
-tqdm
-misaki
-ordered_set
-num2words
-spacy
 kokoro>=0.7.11
-soundfile
+ordered_set
+pypinyin
+cn2an
+jieba

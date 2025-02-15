@@ -1,13 +1,14 @@
 import numpy as np
 import torch
-from kokoro_onnx import Kokoro
+#from kokoro_onnx import Kokoro
 import logging
 import os
 import requests
 from tqdm import tqdm
 import io
-from misaki import en, espeak
-from misaki.zh import ZHG2P
+#from misaki import en, espeak
+#from misaki.zh import ZHG2P
+import soundfile as sf
 from kokoro import KPipeline
 
 logger = logging.getLogger(__name__)
@@ -167,53 +168,16 @@ class KokoroSpeaker:
         self.model_path = os.path.join(self.node_dir, MODEL_FILENAME)
 
     def select(self, speaker_name):
-        download_model(self.node_dir)
-        download_voices(self.node_dir)
-        kokoro = Kokoro(self.model_path, self.voices_path)
-        speaker: np.ndarray = kokoro.get_voice_style(speaker_name)
-        return ({"speaker": speaker},)
+    #    download_model(self.node_dir)
+    #    download_voices(self.node_dir)
+    #    kokoro = Kokoro(self.model_path, self.voices_path)
+    #    speaker: np.ndarray = kokoro.get_voice_style(speaker_name)
+    #    return ({"speaker": speaker},)
+        return ({"speaker": speaker_name},)
 
     @classmethod
     def IS_CHANGED(cls, speaker_name):
         return hash(speaker_name)
-
-class KokoroSpeakerCombiner:
-    @classmethod
-    def INPUT_TYPES(s):
-        return {
-            "required": {
-                "speaker_a": ("KOKORO_SPEAKER", ),
-                "speaker_b": ("KOKORO_SPEAKER", ),
-                "weight": ("FLOAT", {"default": 0.5, "min": 0, "max": 1, "step": 0.05}),
-            },
-        }
-
-    RETURN_TYPES = ("KOKORO_SPEAKER",)
-    RETURN_NAMES = ("speaker",)
-
-    FUNCTION = "combine"
-
-    CATEGORY = "kokoro"
-
-    def __init__(self):
-        self.kokoro = None
-        self.node_dir = os.path.dirname(os.path.abspath(__file__))
-        self.voices_path = os.path.join(self.node_dir, VOICES_FILENAME)
-        self.model_path = os.path.join(self.node_dir, MODEL_FILENAME)
-
-    def combine(self, speaker_a, speaker_b, weight):
-        download_model(self.node_dir)
-        download_voices(self.node_dir)
-        weight = weight * 100.0
-        weight_a = weight
-        weight_b = 100.0 - weight
-        speaker = np.add(speaker_a["speaker"] * (weight_a / 100.0), speaker_b["speaker"] * (weight_b / 100.0))
-
-        return ({"speaker": speaker},)
-
-    @classmethod
-    def IS_CHANGED(cls, speaker_a, speaker_b, weight):
-        return hash((speaker_a, speaker_b, weight))
 
 class KokoroGenerator:
     @classmethod
@@ -245,8 +209,8 @@ class KokoroGenerator:
         self.voices_path = os.path.join(self.node_dir, VOICES_FILENAME)
 
     def generate(self, text, speaker, speed, lang):
-        download_model(self.node_dir)
-        download_voices(self.node_dir)
+        #download_model(self.node_dir)
+        #download_voices(self.node_dir)
 
         # np_load_old = np.load
         # np.load = lambda *a, **k: np_load_old(*a, allow_pickle=True, **k)
@@ -256,12 +220,12 @@ class KokoroGenerator:
         if lang is None:
             lang = "en-us"
 
-        try:
-            kokoro = Kokoro(model_path=self.model_path, voices_path=self.voices_path)
-        except Exception as e:
-             logger.error(f"ERROR: could not load kokoro-onnx in generate: {e}")
+        #try:
+        #    kokoro = Kokoro(model_path=self.model_path, voices_path=self.voices_path)
+        #except Exception as e:
+        #     logger.error(f"ERROR: could not load kokoro-onnx in generate: {e}")
              # np.load = np_load_old
-             return (None,)
+        #     return (None,)
 
         try:
             if lang == "cmn":
@@ -279,14 +243,15 @@ class KokoroGenerator:
                     print(gs) # gs => graphemes/text
                     print(ps) # ps => phonemes
                     # display(Audio(data=audio_seg, rate=24000, autoplay=i==0))
-                    # sf.write(f'{i}.wav', audio_seg, 24000) # save each audio file
+                    #sf.write(f'output/{i}.wav', audio_seg, 24000) # save each audio file
+                    print(audio_seg)
                     audio, sample_rate = audio_seg, 24000
-            else:
+#            else:
                 # Misaki G2P with espeak-ng fallback
-                fallback = espeak.EspeakFallback(british=False)
-                g2p = en.G2P(trf=False, british=False, fallback=fallback)
-                phonemes, _ = g2p(text)
-                audio, sample_rate = kokoro.create(phonemes, voice=speaker["speaker"], speed=speed, lang=lang, is_phonemes=True)
+#                fallback = espeak.EspeakFallback(british=False)
+#                g2p = en.G2P(trf=False, british=False, fallback=fallback)
+#                phonemes, _ = g2p(text)
+#                audio, sample_rate = kokoro.create(phonemes, voice=speaker["speaker"], speed=speed, lang=lang, is_phonemes=True)
         except Exception as e:
             logger.error(f"{e}")
             # np.load = np_load_old
@@ -298,7 +263,8 @@ class KokoroGenerator:
              return (None,)
 
         # np.load = np_load_old
-        audio_tensor = torch.from_numpy(audio).unsqueeze(0).unsqueeze(0).float()  # Add a batch dimension AND a channel dimension
+        #audio_tensor = torch.from_numpy(audio).unsqueeze(0).unsqueeze(0).float()  # Add a batch dimension AND a channel dimension
+        audio_tensor = audio_seg.unsqueeze(0).unsqueeze(0).float()
 
         return ({"waveform": audio_tensor, "sample_rate": sample_rate},) #return as tuple
 
@@ -311,11 +277,11 @@ class KokoroGenerator:
 NODE_CLASS_MAPPINGS = {
     "KokoroGenerator": KokoroGenerator,
     "KokoroSpeaker": KokoroSpeaker,
-    "KokoroSpeakerCombiner": KokoroSpeakerCombiner,
+#    "KokoroSpeakerCombiner": KokoroSpeakerCombiner,
 }
 
 NODE_DISPLAY_NAME_MAPPINGS = {
     "KokoroGenerator": "Kokoro Generator",
     "KokoroSpeaker": "Kokoro Speaker",
-    "KokoroSpeakerCombiner": "Kokoro Speaker Combiner",
+#    "KokoroSpeakerCombiner": "Kokoro Speaker Combiner",
 }
